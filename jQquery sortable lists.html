@@ -2,49 +2,78 @@
 <html lang="en">
 <head>
 
-<meta charset='utf-8'>
-<meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
 
-<title></title>
+    <title></title>
 
-<link rel="stylesheet" type="text/css" href="stylesheet.css" media="screen">
+    <link href="stylesheet.css" media="screen" rel="stylesheet" type="text/css">
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-git1.min.js"></script>
+    <script src="jquery-sortable-lists/jquery-sortable-lists.js"></script>
+    <script type="text/javascript">
 
-<script src="https://code.jquery.com/jquery-git1.min.js"></script>
-<script src="jquery-sortable-lists/jquery-sortable-lists.js"></script>
-<script type="text/javascript">
+        $(function () {
+            const options = {
+                maxLevels: 2,					// phrases et similaires
+                insertZonePlus: true,			// AMELIORE PLACEMENT DES BOITES ENTRE OPTIONS
 
-	$(function()
-{
-	const options = {
-		maxLevels: 2,					// phrases et similaires
-		insertZonePlus: true,			// AMELIORE PLACEMENT DES BOITES ENTRE OPTIONS
+                placeholderCss: {'background-color': '#ff8'},
+                hintCss: {'background-color': '#99ff99'},
+                opener: {
+                    active: true,
+                    as: 'html',  // or "class"
+                    close: '<i class="fa fa-minus red"></i>', // or 'fa fa-minus'
+                    open: '<i class="fa fa-plus"></i>', // or 'fa fa-plus'
+                    openerCss: {
+                        'display': 'inline-block', // Default value
+                        'float': 'left', // Default value
+                        'width': '18px',
+                        'height': '18px',
+                        'margin-left': '-35px',
+                        'margin-right': '5px',
+                        'background-position': 'center center', // Default value
+                        'background-repeat': 'no-repeat' // Default value
+                    }
+                }
+            };
 
-		placeholderCss: {'background-color': '#ff8'},
-		hintCss: {'background-color': '#99ff99'},
-		opener: {
-			active: true,
-			as: 'html',  // if as is not set plugin uses background image
-			close: '<i class="fa fa-minus c3"></i>',  // or 'fa-minus c3'
-			open: '<i class="fa fa-plus"></i>',  // or 'fa-plus'
-			openerCss: {
-				'display': 'inline-block',
-				//'width': '18px', 'height': '18px',
-				'float': 'left',
-				'margin-left': '-35px',
-				'margin-right': '5px',
-				//'background-position': 'center center', 'background-repeat': 'no-repeat',
-				'font-size': '1.1em'
-			}
-		}
-	};
+            $('#sTree2').sortableLists(options);
 
-	$('#sTree2').sortableLists( options );
+            $('#toHierBtn').on('click', function () {
+                console.log($('#sTree2').sortableListsToHierarchy());
+            });
 
-	$('#toHierBtn').on( 'click', function() { console.log( $('#sTree2').sortableListsToHierarchy() ); } );
+        });
 
-});
+    </script>
 
-</script>
+    <!-- STRING SIMILARITY -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/universal-sentence-encoder"></script>
+    <script>
+        let tf_model;
+        use.load().then(model => {
+            tf_model = model;
+        });
+
+        function dot(x, y) {
+            let sum;
+            sum = 0;
+            for (let i = 0; i < x.length; i++)
+                sum = sum + x[i] * y[i];
+            return sum;
+        }
+
+        function similarity(a, b) {
+            const magnitudeA = Math.sqrt(dot(a, a));
+            const magnitudeB = Math.sqrt(dot(b, b));
+            if (magnitudeA && magnitudeB)
+                return dot(a, b) / (magnitudeA * magnitudeB);
+            else return false
+        }
+    </script>
+
 </head>
 <body>
 <!-- *** DATA IMPORT *** -->
@@ -52,42 +81,42 @@
 <!-- https://web.dev/read-files/ --><!-- TODO : MAX OF FUNCTIONNALITIES -->
 <input type="file" id="file-selector" multiple accept=".txt"><!-- TODO : ADD MORE accept=".txt, .csv, ... -->
 <script>
-	const fileSelector = document.getElementById('file-selector');
-	fileSelector.addEventListener('change', ({target: {files}}) => {
-		load_data_from_files(files);
-		// clearInputFile(fileSelector);
-	});
-	// function clearInputFile(f){
-	// 	if(f.value){
-	// 		try{
-	// 			f.value = ''; //for IE11, latest Chrome/Firefox/Opera...
-	// 		}catch(err){ }
-	// 		if(f.value){ //for IE5 ~ IE10
-	// 			var form = document.createElement('form'),
-	// 					parentNode = f.parentNode, ref = f.nextSibling;
-	// 			form.appendChild(f);
-	// 			form.reset();
-	// 			parentNode.insertBefore(f,ref);
-	// 		}
-	// 	}
-	// }
+    const fileSelector = document.getElementById('file-selector');
+    fileSelector.addEventListener('change', ({target: {files}}) => {
+        load_data_from_files(files);
+        // clearInputFile(fileSelector);
+    });
+    // function clearInputFile(f){
+    // 	if(f.value){
+    // 		try{
+    // 			f.value = ''; //for IE11, latest Chrome/Firefox/Opera...
+    // 		}catch(err){ }
+    // 		if(f.value){ //for IE5 ~ IE10
+    // 			var form = document.createElement('form'),
+    // 					parentNode = f.parentNode, ref = f.nextSibling;
+    // 			form.appendChild(f);
+    // 			form.reset();
+    // 			parentNode.insertBefore(f,ref);
+    // 		}
+    // 	}
+    // }
 </script>
 
 <!-- ** from textarea ** -->
-<textarea id="textarea"></textarea>
+<label for="textarea"></label><textarea id="textarea"></textarea>
 <button id="submit-textarea" onclick="load_from_textarea()">Submit</button>
 
 <!-- LIST VISUALISATION -->
 <div class="container">
-	<section id="main_content">
-			<ul class="sTree2 listsClass" id="sTree2">
-			</ul>
+    <section id="main_content">
+        <ul class="sTree2 listsClass" id="sTree2">
+        </ul>
 
-			<section>
-				<span id="toHierBtn" class="btn">Submit</span>
-			</section>
+        <section>
+            <span id="toHierBtn" class="btn">Submit</span>
+        </section>
 
-	</section>
+    </section>
 </div>
 
 <script src="load-data.js"></script><!-- ALL FUNCTIONS TO LOAD DATA -->
