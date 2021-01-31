@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset='utf-8'>
+<meta http-equiv="X-UA-Compatible" content="chrome=1">
+
+<title></title>
+
+<link rel="stylesheet" type="text/css" href="stylesheet.css" media="screen">
+
+<script src="https://code.jquery.com/jquery-git1.min.js"></script>
+<script src="jquery-sortable-lists/jquery-sortable-lists.js"></script>
+<script type="text/javascript">
+
+	$(function()
+{
+	var options = {
+		maxLevels: 2,					// phrases et similaires
+		insertZonePlus: true,			// AMELIORE PLACEMENT DES BOITES ENTRE OPTIONS
+
+		placeholderCss: {'background-color': '#ff8'},
+		hintCss: {'background-color':'#99ff99'},
+		opener: {
+			active: true,
+			as: 'html',  // if as is not set plugin uses background image
+			close: '<i class="fa fa-minus c3"></i>',  // or 'fa-minus c3'
+			open: '<i class="fa fa-plus"></i>',  // or 'fa-plus'
+			openerCss: {
+				'display': 'inline-block',
+				//'width': '18px', 'height': '18px',
+				'float': 'left',
+				'margin-left': '-35px',
+				'margin-right': '5px',
+				//'background-position': 'center center', 'background-repeat': 'no-repeat',
+				'font-size': '1.1em'
+			}
+		}
+	};
+
+	$('#sTree2').sortableLists( options );
+
+	$('#toHierBtn').on( 'click', function() { console.log( $('#sTree2').sortableListsToHierarchy() ); } );
+
+});
+
+</script>
+</head>
+<body>
+<div class="container">
+	<section id="main_content">
+			<ul class="sTree2 listsClass" id="sTree2">
+				<li id="item_a" data-module="a">
+					<div>Item a</div>
+				</li>
+				<li id="item_b" data-module="a">
+					<div>Item b</div>
+				</li>
+				<li id="item_c" data-module="a">
+					<div>Item c</div>
+				</li>
+				<li id="item_d" data-module="a">
+					<div>Item d</div>
+				</li>
+				<li id="item_e" data-module="a">
+					<div>Item e</div>
+				</li>
+				<li id="item_f" data-module="a">
+					<div>Item f</div>
+				</li>
+			</ul>
+
+			<section>
+				<span id="toHierBtn" class="btn">Submit</span>
+			</section>
+
+	</section>
+</div>
+
+</body>
+</html>
+
