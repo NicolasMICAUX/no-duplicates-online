@@ -15,12 +15,12 @@
 
 	$(function()
 {
-	var options = {
+	const options = {
 		maxLevels: 2,					// phrases et similaires
 		insertZonePlus: true,			// AMELIORE PLACEMENT DES BOITES ENTRE OPTIONS
 
 		placeholderCss: {'background-color': '#ff8'},
-		hintCss: {'background-color':'#99ff99'},
+		hintCss: {'background-color': '#99ff99'},
 		opener: {
 			active: true,
 			as: 'html',  // if as is not set plugin uses background image
@@ -47,6 +47,22 @@
 </script>
 </head>
 <body>
+<!-- *** DATA IMPORT *** -->
+<!-- ** from file ** -->
+<!-- https://web.dev/read-files/ --><!-- TODO : MAX OF FUNCTIONNALITIES -->
+<input type="file" id="file-selector" multiple accept=".txt, .csv"><!-- TODO : ADD MORE -->
+<script>
+	const fileSelector = document.getElementById('file-selector');
+	fileSelector.addEventListener('change', ({target: {files}}) => {
+		load_data_from_files(files);
+	});
+</script>
+
+<!-- ** from textarea ** -->
+<textarea id="textarea"></textarea>
+<button id="submit-textarea" onclick="load_from_textarea()">Submit</button>
+
+<!-- LIST VISUALISATION -->
 <div class="container">
 	<section id="main_content">
 			<ul class="sTree2 listsClass" id="sTree2">
@@ -77,6 +93,7 @@
 	</section>
 </div>
 
+<script src="load-data.js"></script><!-- ALL FUNCTIONS TO LOAD DATA -->
 </body>
 </html>
 
