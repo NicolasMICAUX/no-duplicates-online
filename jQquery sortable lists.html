@@ -50,12 +50,27 @@
 <!-- *** DATA IMPORT *** -->
 <!-- ** from file ** -->
 <!-- https://web.dev/read-files/ --><!-- TODO : MAX OF FUNCTIONNALITIES -->
-<input type="file" id="file-selector" multiple accept=".txt, .csv"><!-- TODO : ADD MORE -->
+<input type="file" id="file-selector" multiple accept=".txt"><!-- TODO : ADD MORE accept=".txt, .csv, ... -->
 <script>
 	const fileSelector = document.getElementById('file-selector');
 	fileSelector.addEventListener('change', ({target: {files}}) => {
 		load_data_from_files(files);
+		// clearInputFile(fileSelector);
 	});
+	// function clearInputFile(f){
+	// 	if(f.value){
+	// 		try{
+	// 			f.value = ''; //for IE11, latest Chrome/Firefox/Opera...
+	// 		}catch(err){ }
+	// 		if(f.value){ //for IE5 ~ IE10
+	// 			var form = document.createElement('form'),
+	// 					parentNode = f.parentNode, ref = f.nextSibling;
+	// 			form.appendChild(f);
+	// 			form.reset();
+	// 			parentNode.insertBefore(f,ref);
+	// 		}
+	// 	}
+	// }
 </script>
 
 <!-- ** from textarea ** -->
@@ -66,24 +81,6 @@
 <div class="container">
 	<section id="main_content">
 			<ul class="sTree2 listsClass" id="sTree2">
-				<li id="item_a" data-module="a">
-					<div>Item a</div>
-				</li>
-				<li id="item_b" data-module="a">
-					<div>Item b</div>
-				</li>
-				<li id="item_c" data-module="a">
-					<div>Item c</div>
-				</li>
-				<li id="item_d" data-module="a">
-					<div>Item d</div>
-				</li>
-				<li id="item_e" data-module="a">
-					<div>Item e</div>
-				</li>
-				<li id="item_f" data-module="a">
-					<div>Item f</div>
-				</li>
 			</ul>
 
 			<section>
