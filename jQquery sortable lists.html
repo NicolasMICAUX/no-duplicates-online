@@ -40,10 +40,9 @@
 
             $('#sTree2').sortableLists(options);
 
-            $('#toHierBtn').on('click', function () {
+            $('#export').on('click', function () {
                 console.log($('#sTree2').sortableListsToHierarchy());
             });
-
         });
 
     </script>
@@ -113,7 +112,8 @@
         </ul>
 
         <section>
-            <span id="toHierBtn" class="btn">Submit</span>
+            <span id="export" class="btn">Export</span>
+            <span id="export-no-dupl" class="btn" onclick="download_no_duplicates()">Export without duplicates</span>
         </section>
 
     </section>
