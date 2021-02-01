@@ -1,8 +1,7 @@
 function load_data_from_file(file) {
     const reader = new FileReader();
     reader.onload = function(progressEvent){
-        const lines = this.result.split('\n');
-        add_items(lines);
+        return this.result.split('\n');
     };
     reader.readAsText(file);
 }
@@ -44,17 +43,27 @@ function add_items(lines) {   // list of Strings
         //embeddings.print(true /* verbose */);
 
         const current_elems = $('#sTree2').sortableListsToArray();
+        console.log(current_elems);
 
         for (let line = 0; line < lines.length; line++) {
             if (lines[line]) {
-                let sim = 0;
+                let sim = [];
                 for (let i = 0; i < current_elems.length; i++) {
-                    sim = similarity(lines_embeddings[line], $('#'+current_elems[i].id).data('embedding'));
-                    // TODO : check SIMILARITY HIGH ENOUGH
+                    let simil = similarity(lines_embeddings[line], $('#'+current_elems[i].id).data('embedding'));
+                    sim.push(simil);
+                    console.log(`${lines[line]}, ${$('#' + current_elems[i].id).data('value')}=${simil.toString()}`);
+                }
+                let max = Math.max(...sim);
+                let idx_max = sim.indexOf(max);
+                if (max < 0.8) {
+                    add_item(lines[line], lines_embeddings[line]);
+                }
+                else {
+                    //add_item(lines[line], lines_embeddings[line]);
+                    // TODO : ADD ITEM AS SUB-ITEM AT INDEX IDX_MAX
                 }
                 //embeddings.dispose(); // supprimer un tensor de la mémoire
-
-                add_item(lines[line], lines_embeddings[line]);
+                // TODO : free memory
             }
         }
     });
