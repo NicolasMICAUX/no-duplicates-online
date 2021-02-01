@@ -11,7 +11,7 @@ function load_data_from_files(files) {
 // * load data from a file *
 function load_data_from_file(file) {
     const reader = new FileReader();
-    reader.onload = function(progressEvent){
+    reader.onload = function(){
         const lines = this.result.split('\n');
         add_items(lines);
     };
@@ -31,7 +31,7 @@ function load_from_textarea() {
 }
 
 // count number of calls to add_item to generate ids
-var count = 0;
+let count = 0;
 
 // * add an item to the list *
 function add_item(item, embedding) {   // item is a String
@@ -49,7 +49,7 @@ function add_item(item, embedding) {   // item is a String
 function add_child_item(item, embedding, parent) {   // item is a String
     // generate li element
     let parent_elem = $('#'+parent.id);
-    if (parent_elem.data('upperLevels') == 1) {
+    if (parent_elem.data('upperLevels') === 1) {
         // closest match is already a children, so add as a child of parent element
         add_child_item(item, embedding, parent_elem.parent('ul').parent('li'));
     }
@@ -62,15 +62,13 @@ function add_child_item(item, embedding, parent) {   // item is a String
         li.data('embedding', embedding);    // store precomputed embedding
         parent_elem.append(li);
         // <ul style="display: block;">...</ul>    // NOT WORKING
-        // ATTEMPT TO MAKE IT REALIZE IT HAS NEW CHILDREN, NOT WORKING
-        close(parent);
     }
     count++;
 }
 
 // Array to keep distribution*
-var DISTRIB = [];
-var THRESHOLD = 0.8;
+let DISTRIB = [];
+let THRESHOLD = 0.8;
 
 // * add items, checking if not too similar to an existing item *
 function add_items(lines) {   // list of Strings
@@ -100,7 +98,7 @@ function add_items(lines) {   // list of Strings
                     // TODO : update mean, variance..., so threshold
 
                     // TODO : remove in production
-                    console.log(`${lines[line]}, ${$('#' + current_elems[i].id).data('value')}=${simil.toString()}`);
+                    //console.log(`${lines[line]}, ${$('#' + current_elems[i].id).data('value')}=${simil.toString()}`);
                 }
                 // check that new element is not too similar to all existing elements
                 let max = Math.max(...sim);
@@ -134,7 +132,7 @@ function download_no_duplicates() {
 // * download as file *
 // https://stackoverflow.com/questions/3665115/how-to-create-a-file-in-memory-for-user-to-download-but-not-through-server
 function download(filename, text) {
-    var element = document.createElement('a');
+    const element = document.createElement('a');
     element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
     element.setAttribute('download', filename);
 
