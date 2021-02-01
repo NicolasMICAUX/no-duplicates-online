@@ -39,10 +39,32 @@ function add_item(item, embedding) {   // item is a String
     const li = $("<li id='id" + count.toString() + "'><div>" + item + "</div></li>");
     li.data('insideLevels', 0);
     li.data('upperLevels', 0);
-    li.data('module', 'base');
     li.data('value', item);
     li.data('embedding', embedding);    // store precomputed embedding
     $('#sTree2').append( li );
+    count++;
+}
+
+// * add an item as child of an existing item *
+function add_child_item(item, embedding, parent) {   // item is a String
+    // generate li element
+    let parent_elem = $('#'+parent.id);
+    if (parent_elem.data('upperLevels') == 1) {
+        // closest match is already a children, so add as a child of parent element
+        add_child_item(item, embedding, parent_elem.parent('ul').parent('li'));
+    }
+    else {
+        // TODO : NOT WORKING : DISPLAYED BUT NOT TAKEN INTO ACCOUNT BY THE PLUGIN
+        const li = $("<li id='id" + count.toString() + "'><div>" + item + "</div></li>");
+        li.data('insideLevels', 0);
+        li.data('upperLevels', 0);
+        li.data('value', item);
+        li.data('embedding', embedding);    // store precomputed embedding
+        parent_elem.append(li);
+        // <ul style="display: block;">...</ul>    // NOT WORKING
+        // ATTEMPT TO MAKE IT REALIZE IT HAS NEW CHILDREN, NOT WORKING
+        close(parent);
+    }
     count++;
 }
 
@@ -59,6 +81,7 @@ function add_items(lines) {   // list of Strings
         lines_embeddings = embeddings.arraySync();
         // get current items in list
         const current_elems = $('#sTree2').sortableListsToArray();
+        console.log(current_elems);
 
         // for all new lines
         for (let line = 0; line < lines.length; line++) {
@@ -87,7 +110,7 @@ function add_items(lines) {   // list of Strings
                 }
                 else {
                     //add_item(lines[line], lines_embeddings[line]);
-                    // TODO : ADD ITEM AS SUB-ITEM AT INDEX IDX_MAX
+                    add_child_item(lines[line], lines_embeddings[line], current_elems[idx_max]);
                 }
                 //embeddings.dispose(); // supprimer un tensor de la mémoire
                 // TODO : free memory

@@ -386,6 +386,7 @@
 					}
 
 					// MODIFIED : CLOSE AFTER DRAG BY DEFAULT
+					console.log(hintWrapperNode.parent());
 					close(hintWrapperNode.parent());
 
 					// Directly removed placeholder looks bad. It jumps up if the hint is below.
