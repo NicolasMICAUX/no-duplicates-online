@@ -107,7 +107,6 @@ function add_items(lines) {   // list of Strings
             // check that new element is not too similar to all existing elements
             let max = Math.max(...sim);
             let idx_max = sim.indexOf(max);
-            console.log(MEAN + ALPHA * Math.sqrt(VAR));
             if (max < MEAN + ALPHA * Math.sqrt(VAR)) {
                 add_item(lines[line], lines_embeddings[line]);
             } else {
