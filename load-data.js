@@ -1,4 +1,3 @@
-
 // * load data from multplie files *
 // called by "input files"
 function load_data_from_files(files) {
@@ -11,7 +10,7 @@ function load_data_from_files(files) {
 // * load data from a file *
 function load_data_from_file(file) {
     const reader = new FileReader();
-    reader.onload = function(){
+    reader.onload = function () {
         const lines = this.result.split('\n');
         add_items(lines);
     };
@@ -23,7 +22,7 @@ function load_from_textarea() {
     const area = document.getElementById("textarea");
 
     // split lines
-    const lines = area.value.replace(/\r\n/g,"\n").split("\n").filter(line => line);
+    const lines = area.value.replace(/\r\n/g, "\n").split("\n").filter(line => line);
     // https://stackoverflow.com/questions/2299604/javascript-convert-textarea-into-an-array
 
     add_items(lines);
@@ -41,19 +40,18 @@ function add_item(item, embedding) {   // item is a String
     li.data('upperLevels', 0);
     li.data('value', item);
     li.data('embedding', embedding);    // store precomputed embedding
-    $('#sTree2').append( li );
+    $('#sTree2').append(li);
     count++;
 }
 
 // * add an item as child of an existing item *
 function add_child_item(item, embedding, parent) {   // item is a String
     // generate li element
-    let parent_elem = $('#'+parent.id);
+    let parent_elem = $('#' + parent.id);
     if (parent_elem.data('upperLevels') === 1) {
         // closest match is already a children, so add as a child of parent element
         add_child_item(item, embedding, parent_elem.parent('ul').parent('li'));
-    }
-    else {
+    } else {
         // TODO : NOT WORKING : DISPLAYED BUT NOT TAKEN INTO ACCOUNT BY THE PLUGIN
         const li = $("<li id='id" + count.toString() + "'><div>" + item + "</div></li>");
         li.data('insideLevels', 0);
@@ -66,12 +64,16 @@ function add_child_item(item, embedding, parent) {   // item is a String
     count++;
 }
 
-// Array to keep distribution*
-let DISTRIB = [];
-let THRESHOLD = 0.8;
+//let THRESHOLD = 0.8;
+const ALPHA = 0.75;
+let MEAN = 0;
+let VAR = 0;    // variance
+let N = 0;
 
 // * add items, checking if not too similar to an existing item *
 function add_items(lines) {   // list of Strings
+    // remove empty lines
+    lines = lines.filter(Boolean);
     // compute embeddings for new lines
     tf_model.embed(lines).then(embeddings => {
 
@@ -79,40 +81,41 @@ function add_items(lines) {   // list of Strings
         lines_embeddings = embeddings.arraySync();
         // get current items in list
         const current_elems = $('#sTree2').sortableListsToArray();
-        console.log(current_elems);
+
+        // compute all similarities
+        for (let i = 0; i < lines.length; i++) {
+            for (let j = i + 1; j < lines.length; j++) {
+                update(similarity(lines_embeddings[i], lines_embeddings[j]));
+            }
+        }
 
         // for all new lines
         for (let line = 0; line < lines.length; line++) {
-            // assert line is not empty
-            if (lines[line]) {
-                // similarity to all existing elements
-                let sim = [];
-                for (let i = 0; i < current_elems.length; i++) {
-                    // TODO : prevent same (to prevent aberration in distribution !)
-                    // compute similarity
-                    let simil = similarity(lines_embeddings[line], $('#'+current_elems[i].id).data('embedding'));
-                    sim.push(simil);
-
-                    // add similarity to sim. distribution
-                    DISTRIB.pushSorted(simil);
-                    // TODO : update mean, variance..., so threshold
-
-                    // TODO : remove in production
-                    //console.log(`${lines[line]}, ${$('#' + current_elems[i].id).data('value')}=${simil.toString()}`);
-                }
-                // check that new element is not too similar to all existing elements
-                let max = Math.max(...sim);
-                let idx_max = sim.indexOf(max);
-                if (max < THRESHOLD) {
-                    add_item(lines[line], lines_embeddings[line]);
-                }
-                else {
-                    //add_item(lines[line], lines_embeddings[line]);
-                    add_child_item(lines[line], lines_embeddings[line], current_elems[idx_max]);
-                }
-                //embeddings.dispose(); // supprimer un tensor de la mémoire
-                // TODO : free memory
+            // add similarity to all other lines in the distrib
+            for (let line = 0; line < lines.length; line++) {
             }
+
+            // similarity to all existing elements
+            let sim = [];
+            for (let i = 0; i < current_elems.length; i++) {
+                // TODO : prevent same (to prevent aberration in distribution !)
+                // compute similarity
+                let simil = similarity(lines_embeddings[line], $('#' + current_elems[i].id).data('embedding'));
+                sim.push(simil);
+                update(simil);  // update VAR etc.
+            }
+            // check that new element is not too similar to all existing elements
+            let max = Math.max(...sim);
+            let idx_max = sim.indexOf(max);
+            console.log(MEAN + ALPHA * Math.sqrt(VAR));
+            if (max < MEAN + ALPHA * Math.sqrt(VAR)) {
+                add_item(lines[line], lines_embeddings[line]);
+            } else {
+                //add_item(lines[line], lines_embeddings[line]);
+                add_child_item(lines[line], lines_embeddings[line], current_elems[idx_max]);
+            }
+            //embeddings.dispose(); // supprimer un tensor de la mémoire
+            // TODO : free memory
         }
     });
 }
@@ -148,19 +151,19 @@ function download(filename, text) {
 
 // * push an item into a sorted array *
 //https://stackoverflow.com/questions/42946561/how-can-i-push-an-element-into-array-at-a-sorted-index-position
-const sortByPrice = (a, b) => a > b;
+const sortByValue = (a, b) => a > b;
 
-Array.prototype.pushSorted = function(el, compareFn=sortByPrice) {
-    this.splice((function(arr) {
+Array.prototype.pushSorted = function (el, compareFn = sortByValue) {
+    this.splice((function (arr) {
         let m = 0;
         let n = arr.length - 1;
 
-        while(m <= n) {
+        while (m <= n) {
             let k = (n + m) >> 1;
             let cmp = compareFn(el, arr[k]);
 
-            if(cmp > 0) m = k + 1;
-            else if(cmp < 0) n = k - 1;
+            if (cmp > 0) m = k + 1;
+            else if (cmp < 0) n = k - 1;
             else return k;
         }
 
@@ -169,3 +172,12 @@ Array.prototype.pushSorted = function(el, compareFn=sortByPrice) {
 
     return this.length;
 };
+
+function update(simil) {
+    N++;
+    // update mean
+    let last_mean = MEAN;
+    MEAN = ((N - 1) * MEAN + simil) / N;
+    // update Variance
+    VAR = ((N - 2) * VAR + (simil - MEAN) * (simil - last_mean)) / (N - 1 || 1);  // https://math.stackexchange.com/q/775391
+}
