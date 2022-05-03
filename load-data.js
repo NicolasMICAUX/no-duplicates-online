@@ -77,9 +77,12 @@ function add_items(lines) {   // list of Strings
 
     // if foreign, translate
     let text = lines.join(" | ");
-    const client = new HttpClient();
-    client.get(`https://nmtransl.herokuapp.com/?text=${text}`, function (response) {
+    // const client = new HttpClient();
+    
+    // client.get(`https://nmtransl.herokuapp.com/?text=${text}`, function (response) {
+        let response = text;
         let translated = response.split("|");
+        
 
         // compute embeddings for new lines
         tf_model.embed(translated).then(embeddings => {
@@ -122,7 +125,7 @@ function add_items(lines) {   // list of Strings
                 //embeddings.dispose(); // supprimer un tensor de la mémoire
                 // TODO : free memory
             }
-        });
+        // });
     });
 }
 
